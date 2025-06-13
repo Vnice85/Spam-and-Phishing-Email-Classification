@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Ignore specific inbox view files
+src/app/inbox/InboxView1.tsx
+src/app/inbox/page2.tsx
+src/components/Sidebar1.tsx
+src/app/inbox/page_backup.tsx

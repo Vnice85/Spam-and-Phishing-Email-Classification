@@ -32,7 +32,7 @@ import {
 
 
 export function Sidebar({ onCompose }: Props) {
-    useEffect(() => {
+  useEffect(() => {
     const interval = setInterval(() => {
       autoRefreshToken();
     }, 2 * 60 * 1000); // gọi mỗi 2 phút
@@ -40,7 +40,7 @@ export function Sidebar({ onCompose }: Props) {
   }, []);
   return (
     <aside className="w-64 h-screen border-r border-gray-200 bg-gray-50 flex flex-col px-4 py-6 space-y-6 text-sm text-gray-800">
-      
+
       {/* User Info */}
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -58,7 +58,7 @@ export function Sidebar({ onCompose }: Props) {
           <FontAwesomeIcon icon={faPenToSquare} className="text-gray-600 w-4 h-4" />
         </button>
       </div>
-      
+
       {/* Search */}
       <div className="relative">
         <input

@@ -1,15 +1,11 @@
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Sidebar } from "@/components/Sidebar";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
-import { Roboto } from 'next/font/google'
 
-const roboto = Roboto({
-  subsets: ['latin'],
-  weight: ['400', '500', '700'],
-  variable: '--font-roboto'
-})
 config.autoAddCss = false;
 
 const geistSans = Geist({
@@ -35,9 +31,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex bg-gray-50`}
       >
-        {children}
+        <Sidebar onCompose={() => console.log("Gửi Email clicked")} />
+        <main className="flex-1 p-6 overflow-y-scroll h-screen">{children}</main>
       </body>
     </html>
   );

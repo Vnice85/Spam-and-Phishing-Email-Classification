@@ -4,11 +4,7 @@ type Props = {
   onClose: () => void
 }
 import { useState } from 'react'
-import dynamic from 'next/dynamic'
-type SidebarProps = {
-  onCompose: () => void
-}
-const Sidebar = dynamic<SidebarProps>(() => import('@/components/Sidebar').then(mod => mod.Sidebar), { ssr: false })
+import { Sidebar } from '@/components/Sidebar'
 import ComposeEmailModal from '@/components/ComposeEmailModal'
 import EmailDetailModal from '@/components/EmailDetailModal'
 
@@ -54,22 +50,22 @@ export default function InboxView() {
       prev.map(e =>
         e.id === selectedEmail.id
           ? {
-              ...e,
-              labels: remove
-                ? e.labels.filter(l => l !== label)
-                : Array.from(new Set([...e.labels, label]))
-            }
+            ...e,
+            labels: remove
+              ? e.labels.filter(l => l !== label)
+              : Array.from(new Set([...e.labels, label]))
+          }
           : e
       )
     )
     setSelectedEmail(prev =>
       prev
         ? {
-            ...prev,
-            labels: remove
-              ? prev.labels.filter(l => l !== label)
-              : Array.from(new Set([...prev.labels, label]))
-          }
+          ...prev,
+          labels: remove
+            ? prev.labels.filter(l => l !== label)
+            : Array.from(new Set([...prev.labels, label]))
+        }
         : null
     )
   }
@@ -83,15 +79,15 @@ export default function InboxView() {
   }
 
   return (
-    <div className="flex">
+    <div className="flex flex-col md:flex-row min-h-screen">
       <Sidebar onCompose={handleCompose} />
-      <div className="flex-1 px-6 py-4">
-        <h1 className="text-xl font-bold mb-6">Inbox</h1>
-        <div className="divide-y divide-gray-200">
+      <div className="flex-1 px-4 sm:px-6 py-4 bg-gradient-to-br from-blue-200/40 via-white/20 to-purple-200/30 backdrop-blur-xl border border-white/30 ring-1 ring-white/20 rounded-xl shadow-2xl hover:shadow-blue-300/50 hover:scale-[1.01] transition-all duration-300 mx-2 sm:mx-4 my-4 sm:my-6">
+        <h1 className="text-xl font-bold mb-6 ml-10 md:ml-0">Inbox</h1>
+        <div className="divide-y divide-gray-200 overflow-x-auto">
           {emails.map(email => (
             <div
               key={email.id}
-              className="grid grid-cols-[auto_auto_1fr_auto_auto] items-center gap-4 py-2 hover:bg-gray-50"
+              className="grid grid-cols-1 sm:grid-cols-[auto_auto_1fr_auto_auto] items-start sm:items-center gap-4 py-2 hover:bg-gray-50"
             >
               <input type="checkbox" className="ml-2" />
               {!email.isRead && <span className="h-2 w-2 bg-blue-500 rounded-full" />}
@@ -99,7 +95,7 @@ export default function InboxView() {
                 className="flex flex-col overflow-hidden cursor-pointer"
                 onClick={() => handleOpenEmail(email)}
               >
-                <div className="flex gap-4 items-center truncate">
+                <div className="flex flex-wrap md:flex-nowrap gap-4 items-center truncate">
                   <span className="font-medium w-32 truncate">{email.sender}</span>
                   <span className="w-48 truncate">{email.subject}</span>
                   <span className="text-gray-500 truncate flex-1">{email.snippet}</span>
