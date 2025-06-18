@@ -5,7 +5,8 @@ import { useEffect } from 'react'
 import { isAuthenticated } from '@/utils/auth'
 import Image from 'next/image'
 
-export default function LandingPage() {
+
+export default function () {
   const router = useRouter()
 
   useEffect(() => {
