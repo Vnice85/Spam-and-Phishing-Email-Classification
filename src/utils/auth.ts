@@ -11,7 +11,7 @@ export function loginWithGoogle(callback?: () => void) {
     if (d.jwt) {
       localStorage.setItem('jwtToken', d.jwt);
       localStorage.setItem('userName', d.userName || '');
-      localStorage.setItem('userId', d.userId || '');
+      // localStorage.setItem('userId', d.userId || '');
       localStorage.setItem('profileImage', d.profileImage || '');
       localStorage.setItem('expiresAt', d.expiresAt || '');
       window.removeEventListener('message', listener); // cleanup
@@ -66,3 +66,5 @@ export function isAuthenticated() {
   const now = new Date().getTime()
   return expireTime > now // còn hạn thì hợp lệ
 }
+
+

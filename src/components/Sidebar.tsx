@@ -28,6 +28,19 @@ type Props = {
 }
 
 export function Sidebar({ onCompose }: Props) {
+  const [userName, setUserName] = useState('')
+  const [userEmail, setUserEmail] = useState('')
+  const [profileImage, setProfileImage] = useState('')
+
+  useEffect(() => {
+    const name = localStorage.getItem('userName') || ''
+    const email = localStorage.getItem('userEmail') || ''
+    const image = localStorage.getItem('profileImage') || ''
+    setUserName(name)
+    setUserEmail(email)
+    setProfileImage(image)
+  }, [])
+
   const [showSidebar, setShowSidebar] = useState(false)
 
   useEffect(() => {
@@ -64,10 +77,10 @@ export function Sidebar({ onCompose }: Props) {
         {/* User Info */}
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <img src="https://i.pravatar.cc/40" className="rounded-full w-8 h-8" alt="avatar" />
+            <img src={profileImage || 'https://i.pravatar.cc/40'} className="rounded-full w-8 h-8" alt="avatar" />
             <div className="flex flex-col">
-              <span className="font-semibold text-sm">nguyen the van</span>
-              <span className="text-xs text-gray-500">zanngyn@gmail.com</span>
+              <span className="font-semibold text-sm">{userName || 'Guest'}</span>
+              <span className="text-xs text-gray-500">{userEmail || 'No email'}</span>
             </div>
           </div>
           <button
@@ -115,8 +128,7 @@ export function Sidebar({ onCompose }: Props) {
 
         {/* Others */}
         <div className="mt-auto space-y-2">
-          <SidebarItem icon={faCog} label="Settings" href="/settings" />
-          <SidebarItem icon={faQuestionCircle} label="Support & feedback" href="#" />
+
           <button
             onClick={() => {
               localStorage.clear()
@@ -126,7 +138,7 @@ export function Sidebar({ onCompose }: Props) {
             title="Đăng xuất"
           >
             <FontAwesomeIcon icon={faSignOutAlt} className="w-4 h-4" />
-            <span>Log out</span>
+            <span>Đăng xuất</span>
           </button>
         </div>
       </aside>

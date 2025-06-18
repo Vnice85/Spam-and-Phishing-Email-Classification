@@ -1,128 +1,92 @@
 'use client'
 
-import { X } from 'lucide-react'
-import { Dialog } from '@headlessui/react'
-import { useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-  faReply,
-  faShare,
-  faInbox,
-  faEnvelopeOpen
-} from '@fortawesome/free-solid-svg-icons'
-
-export type Email = {
-  id: string
-  subject: string
-  sender: string
-  snippet: string
-  content: string
-  date: string
-  isRead: boolean
-  labels?: string[]
-}
+import { faTimes, faReply, faArchive, faTrash, faTimes as faClose } from '@fortawesome/free-solid-svg-icons'
 
 type Props = {
-  email: Email
   onClose: () => void
-  markAsUnread: (id: string) => void
-  onAddLabel?: (label: string, remove?: boolean) => void
+  email: {
+    subject: string
+    fromAddress: string
+    toAddress: string
+    sentDate: string
+    body: string
+  }
 }
 
-export default function EmailDetailModal({ email, onClose, markAsUnread, onAddLabel }: Props) {
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [onClose])
+export default function EmailDetailModal({ onClose, email }: Props) {
+  if (!email.body) {
+    return (
+      <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+        <div className="bg-white rounded-lg p-6 shadow max-w-xl w-full text-center">
+          <p className="text-gray-600">Không có nội dung email để hiển thị.</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <Dialog open={true} onClose={onClose} className="relative z-50">
-      <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+      <div className="relative bg-white max-w-4xl w-full rounded-lg shadow-xl p-6 overflow-y-auto max-h-[90vh] space-y-6">
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-4 text-gray-500 hover:text-black text-xl"
+        >
+          <FontAwesomeIcon icon={faTimes} />
+        </button>
 
-      <div className="fixed inset-0 flex items-center justify-center p-4">
-        <Dialog.Panel className="w-full max-w-3xl p-6 bg-white rounded-xl shadow-xl">
-          <div className="flex justify-between items-start border-b pb-4">
-            <div>
-              <h2 className="text-xl font-semibold mb-1">{email.subject}</h2>
-              <div className="text-sm text-gray-500">Từ: {email.sender}</div>
-              <div className="text-sm text-gray-400">{new Date(email.date).toLocaleString()}</div>
-              {email.labels && email.labels.length > 0 && (
-                <div className="mt-2 flex gap-2 flex-wrap">
-                  {email.labels.map(label => (
-                    <span
-                      key={label}
-                      className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded inline-flex items-center gap-1"
-                    >
-                      {label}
-                      {onAddLabel && (
-                        <button
-                          onClick={() => onAddLabel?.(label, true)}
-                          className="text-gray-400 hover:text-red-500"
-                          title="Gỡ nhãn"
-                        >
-                          ×
-                        </button>
-                      )}
-                    </span>
-                  ))}
-                </div>
-              )}
-              {onAddLabel && (
-                <div className="mt-4">
-                  <div className="text-sm font-medium text-gray-700 mb-1">Gắn nhãn:</div>
-                  <div className="flex gap-2 flex-wrap">
-                    {['Công việc', 'Cá nhân', 'Khẩn cấp', 'Khác'].map(label => (
-                      <button
-                        key={label}
-                        onClick={() => onAddLabel?.(label)}
-                        className="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-sm rounded"
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
+        <div className="space-y-4">
+          <h1 className="text-2xl font-bold text-gray-900">Chi tiết Email</h1>
+          <h2 className="text-xl font-semibold text-gray-900">{email.subject}</h2>
+
+          <div className="text-sm text-gray-700 space-y-1">
+            <div><span className="font-semibold">Người gửi:</span> <span>{email.fromAddress}</span></div>
+            <div><span className="font-semibold">Người nhận:</span> <span>{email.toAddress}</span></div>
+            <div className="text-xs text-gray-500">
+              <span className="font-medium">Thời gian gửi:</span>{' '}
+              {email.sentDate ? new Date(email.sentDate).toLocaleString() : '(không rõ)'}
             </div>
+          </div>
+
+          <hr className="my-2" />
+
+          <h3 className="text-base font-medium text-gray-900">Nội dung Mail</h3>
+          <div
+            className="prose max-w-none text-gray-800 text-sm leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: email.body }}
+          />
+          <div className="flex justify-end space-x-3 pt-4 border-t">
+            <button
+              onClick={() => alert('Trả lời email')}
+              className="flex items-center space-x-1 px-3 py-1 text-sm text-blue-600 hover:underline"
+            >
+              <FontAwesomeIcon icon={faReply} />
+              <span>Trả lời</span>
+            </button>
+            <button
+              onClick={() => alert('Lưu trữ email')}
+              className="flex items-center space-x-1 px-3 py-1 text-sm text-gray-600 hover:underline"
+            >
+              <FontAwesomeIcon icon={faArchive} />
+              <span>Lưu trữ</span>
+            </button>
+            <button
+              onClick={() => alert('Xoá email')}
+              className="flex items-center space-x-1 px-3 py-1 text-sm text-red-600 hover:underline"
+            >
+              <FontAwesomeIcon icon={faTrash} />
+              <span>Xoá</span>
+            </button>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition"
-              title="Đóng"
+              className="flex items-center space-x-1 px-3 py-1 text-sm text-gray-500 hover:underline"
             >
-              <X />
+              <FontAwesomeIcon icon={faClose} />
+              <span>Đóng</span>
             </button>
           </div>
-
-          <div className="mt-6 whitespace-pre-line text-sm text-gray-800">
-            {email.content}
-          </div>
-
-          <div className="mt-8 flex justify-end gap-4 text-sm">
-            <button className="flex items-center gap-1 text-gray-600 hover:text-blue-600" title="Trả lời">
-              <FontAwesomeIcon icon={faReply} /> <span>Trả lời</span>
-            </button>
-            <button className="flex items-center gap-1 text-gray-600 hover:text-blue-600" title="Chuyển tiếp">
-              <FontAwesomeIcon icon={faShare} /> <span>Chuyển tiếp</span>
-            </button>
-            <button className="flex items-center gap-1 text-gray-600 hover:text-blue-600" title="Lưu trữ">
-              <FontAwesomeIcon icon={faInbox} /> <span>Lưu trữ</span>
-            </button>
-            <button
-              className="flex items-center gap-1 text-gray-600 hover:text-blue-600"
-              title="Đánh dấu là chưa đọc"
-              onClick={() => {
-                markAsUnread(email.id)
-                onClose()
-              }}
-            >
-              <FontAwesomeIcon icon={faEnvelopeOpen} /> <span>Chưa đọc</span>
-            </button>
-          </div>
-        </Dialog.Panel>
+        </div>
       </div>
-    </Dialog>
+    </div>
   )
 }

@@ -38,6 +38,7 @@ export default function InboxView() {
   const [isComposeOpen, setIsComposeOpen] = useState(false)
 
   const handleOpenEmail = (email: Email) => {
+    // TODO: Sau này nếu cần gọi API để lấy chi tiết email, thực hiện tại đây rồi setSelectedEmail
     setSelectedEmail(email)
     setEmails(prev =>
       prev.map(e => e.id === email.id ? { ...e, isRead: true } : e)
@@ -87,7 +88,7 @@ export default function InboxView() {
           {emails.map(email => (
             <div
               key={email.id}
-              className="grid grid-cols-1 sm:grid-cols-[auto_auto_1fr_auto_auto] items-start sm:items-center gap-4 py-2 hover:bg-gray-50"
+              className="grid grid-cols-1 sm:grid-cols-[auto_auto_1fr_auto_auto] items-start sm:items-center gap-4 py-2 hover:bg-gray-50 border-b border-gray-200 px-2 sm:px-4"
             >
               <input type="checkbox" className="ml-2" />
               {!email.isRead && <span className="h-2 w-2 bg-blue-500 rounded-full" />}
@@ -102,7 +103,7 @@ export default function InboxView() {
                 </div>
                 <div className="flex gap-1 text-xs text-gray-600 mt-1">
                   {email.labels.map(label => (
-                    <span key={label} className="bg-gray-100 px-2 py-0.5 rounded">{label}</span>
+                    <span key={`${email.id}-${label}`} className="bg-gray-100 px-2 py-0.5 rounded">{label}</span>
                   ))}
                 </div>
               </div>
