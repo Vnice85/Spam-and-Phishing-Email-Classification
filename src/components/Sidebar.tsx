@@ -19,18 +19,22 @@ import {
   faQuestionCircle,
   faSearch,
   faSignOutAlt,
-  faBars
+  faBars,
+  faRobot
 } from "@fortawesome/free-solid-svg-icons"
 import { autoRefreshToken } from '@/utils/auth'
 
 type Props = {
   onCompose: () => void
+  setSearchContent: (query: string) => void
+  setIsClassify: (isClassify: boolean) => void
 }
 
-export function Sidebar({ onCompose }: Props) {
+export function Sidebar({ onCompose, setSearchContent, setIsClassify }: Props) {
   const [userName, setUserName] = useState('')
   const [userEmail, setUserEmail] = useState('')
   const [profileImage, setProfileImage] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     const name = localStorage.getItem('userName') || ''
@@ -42,6 +46,11 @@ export function Sidebar({ onCompose }: Props) {
   }, [])
 
   const [showSidebar, setShowSidebar] = useState(false)
+
+
+  const handleSearch = () => {
+    setSearchContent(searchQuery)
+  }
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -97,33 +106,43 @@ export function Sidebar({ onCompose }: Props) {
           <input
             type="text"
             placeholder="Search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-8 pr-3 py-1.5 rounded bg-gray-100 text-sm placeholder-gray-400"
           />
-          <FontAwesomeIcon icon={faSearch} className="absolute left-2 top-2.5 w-4 h-4 text-gray-400" />
+          <button
+            onClick={() => handleSearch()}
+            className="absolute left-2 top-2.5"
+          >
+            <FontAwesomeIcon icon={faSearch} className="w-4 h-4 text-gray-400" />
+          </button>
         </div>
 
         {/* Views */}
         <div>
           <div className="uppercase text-xs text-gray-400 mb-1">Views</div>
           <SidebarItem icon={faInbox} label="Inbox" href="/" badge="99+" active />
-          <SidebarItem icon={faUserFriends} label="GitHub" href="#" badge="40" />
+          {/* <SidebarItem icon={faUserFriends} label="GitHub" href="#" badge="40" />
           <SidebarItem icon={faCalendar} label="Calendar" href="#" />
           <SidebarItem icon={faTags} label="Labels" href="#" badge="99+" />
           <SidebarItem icon={faUserFriends} label="Social" href="#" badge="99+" />
-          <SidebarItem icon={faShoppingCart} label="Promotions" href="#" badge="99+" />
-          <div className="flex items-center text-gray-500 hover:underline cursor-pointer text-sm mt-1">
+          <SidebarItem icon={faShoppingCart} label="Promotions" href="#" badge="99+" /> */}
+          {/* <div className="flex items-center text-gray-500 hover:underline cursor-pointer text-sm mt-1">
             <FontAwesomeIcon icon={faPlus} className="mr-2" />
             Add view
-          </div>
+          </div> */}
         </div>
 
         {/* Mail */}
         <div>
-          <div className="uppercase text-xs text-gray-400 mb-1">Mail</div>
-          <SidebarItem icon={faEnvelope} label="All Mail" href="/all" />
+          <div className="uppercase text-xs text-gray-400 mb-1">Công cụ</div>
+          {/* <SidebarItem icon={faEnvelope} label="All Mail" href="/all" />
           <SidebarItem icon={faPaperPlane} label="Sent" href="/send" />
           <SidebarItem icon={faPen} label="Drafts" href="/drafts" />
-          <SidebarItem icon={faTrash} label="Trash" href="/trash" />
+          <SidebarItem icon={faTrash} label="Trash" href="/trash" />\ */}
+          <button onClick={() => { setIsClassify(true) }}>
+            <SidebarItem icon={faRobot} label="Auto labeling" href="#" />
+          </button>
         </div>
 
         {/* Others */}
@@ -141,7 +160,7 @@ export function Sidebar({ onCompose }: Props) {
             <span>Đăng xuất</span>
           </button>
         </div>
-      </aside>
+      </aside >
     </>
   )
 }

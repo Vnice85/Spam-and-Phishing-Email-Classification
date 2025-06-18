@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTimes, faPaperPlane, faTrash, faSave } from '@fortawesome/free-solid-svg-icons'
+import { sendEmail, createDraftEmail } from '@/services/api'
 
 type Props = {
   onClose: () => void
@@ -22,8 +23,37 @@ export default function ComposeEmailModal({ onClose, onCompose, user }: Props) {
   const [subject, setSubject] = useState('')
   const [content, setContent] = useState('')
 
-  const handleSend = () => {
+  const handleSend = async () => {
     console.log('Sending email:', { to, subject, content })
+    const payload = {
+      toAddress: to,
+      subject,
+      body: content,
+    }
+
+    try {
+      await sendEmail(payload)
+    } catch (error) {
+      console.error('Failed to send email:', error)
+    }
+    onCompose?.()
+    onClose()
+  }
+
+  const handleDraft = async () => {
+    console.log('Sending email:', { to, subject, content })
+    const payload = {
+      toAddress: to,
+      subject,
+      body: content,
+    }
+
+    try {
+      const result = await createDraftEmail(payload)
+      console.log('Draft created:', result)
+    } catch (error) {
+      console.error('Failed to save draft email:', error)
+    }
     onCompose?.()
     onClose()
   }
@@ -93,7 +123,7 @@ export default function ComposeEmailModal({ onClose, onCompose, user }: Props) {
               <FontAwesomeIcon icon={faTrash} className="w-5 h-5" />
             </button>
             <button
-              onClick={() => alert('Draft saved')}
+              onClick={handleDraft}
               className="w-10 h-10 justify-center bg-blue-100 text-blue-700 rounded hover:bg-blue-200 flex items-center text-sm"
               title="Save draft"
             >

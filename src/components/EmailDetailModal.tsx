@@ -2,20 +2,30 @@
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTimes, faReply, faArchive, faTrash, faTimes as faClose } from '@fortawesome/free-solid-svg-icons'
+import { deleteEmail } from '@/services/api'
 
 type Props = {
   onClose: () => void
   email: {
     subject: string
-    fromAddress: string
-    toAddress: string
-    sentDate: string
-    body: string
+    // fromAddress: string
+    // toAddress: string
+    // sentDate: string
+    // body: string
+    id: string;
+    sender: string;
+    snippet: string;
+    content?: string;
+    date: string;
+    isRead: boolean;
+    labels: string[];
   }
+  markAsUnread?: (id: string) => void
 }
 
-export default function EmailDetailModal({ onClose, email }: Props) {
-  if (!email.body) {
+
+export default function EmailDetailModal({ onClose, email, markAsUnread }: Props) {
+  if (!email) {
     return (
       <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-6">
         <div className="bg-white rounded-lg p-6 shadow max-w-xl w-full text-center">
@@ -24,6 +34,24 @@ export default function EmailDetailModal({ onClose, email }: Props) {
       </div>
     )
   }
+
+  const handleDelete = async () => {
+    const confirmDelete = window.confirm('Bạn có chắc chắn muốn xoá email này?');
+
+    if (!confirmDelete) return;
+
+    try {
+      const result = await deleteEmail(email.id);
+      console.log('Xoá email thành công:', result);
+
+      alert('Email đã được xoá thành công.');
+      onClose();
+      window.location.reload();
+    } catch (error) {
+      console.error('Xoá email thất bại:', error);
+      alert('Không thể xoá email. Vui lòng thử lại sau.');
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-6">
@@ -40,11 +68,11 @@ export default function EmailDetailModal({ onClose, email }: Props) {
           <h2 className="text-xl font-semibold text-gray-900">{email.subject}</h2>
 
           <div className="text-sm text-gray-700 space-y-1">
-            <div><span className="font-semibold">Người gửi:</span> <span>{email.fromAddress}</span></div>
-            <div><span className="font-semibold">Người nhận:</span> <span>{email.toAddress}</span></div>
+            <div><span className="font-semibold">Người gửi:</span> <span>{email.sender}</span></div>
+            {/* <div><span className="font-semibold">Người nhận:</span> <span>{email.toAddress}</span></div> */}
             <div className="text-xs text-gray-500">
               <span className="font-medium">Thời gian gửi:</span>{' '}
-              {email.sentDate ? new Date(email.sentDate).toLocaleString() : '(không rõ)'}
+              {email.date ? new Date(email.date).toLocaleString() : '(không rõ)'}
             </div>
           </div>
 
@@ -53,7 +81,7 @@ export default function EmailDetailModal({ onClose, email }: Props) {
           <h3 className="text-base font-medium text-gray-900">Nội dung Mail</h3>
           <div
             className="prose max-w-none text-gray-800 text-sm leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: email.body }}
+            dangerouslySetInnerHTML={{ __html: email.content || '' }}
           />
           <div className="flex justify-end space-x-3 pt-4 border-t">
             <button
@@ -71,7 +99,7 @@ export default function EmailDetailModal({ onClose, email }: Props) {
               <span>Lưu trữ</span>
             </button>
             <button
-              onClick={() => alert('Xoá email')}
+              onClick={() => handleDelete()}
               className="flex items-center space-x-1 px-3 py-1 text-sm text-red-600 hover:underline"
             >
               <FontAwesomeIcon icon={faTrash} />
