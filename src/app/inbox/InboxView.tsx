@@ -78,7 +78,7 @@ export default function InboxView() {
   const handleCloseCompose = () => {
     setIsComposeOpen(false)
   }
-
+  console.log(selectedEmail)
   return (
     <div className="flex flex-col md:flex-row min-h-screen">
       <Sidebar onCompose={handleCompose} />

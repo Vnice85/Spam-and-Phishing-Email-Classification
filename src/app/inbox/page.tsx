@@ -3,11 +3,17 @@ import { useState, useEffect } from 'react';
 import { Sidebar } from '@/components/Sidebar';
 import EmailDetailModal from '@/components/EmailDetailModal';
 import { Star } from 'lucide-react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheckDouble, faClock, faInbox, faTrash, faExclamationTriangle, faTags, faRobot, faFilter, faPen, faRotateRight, faEye } from '@fortawesome/free-solid-svg-icons';
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+// import { faCheckDouble, faClock, faInbox, faTrash, faExclamationTriangle, faTags, faRobot, faFilter, faPen, faRotateRight, faEye } from '@fortawesome/free-solid-svg-icons';
 import ComposeEmailModal from '@/components/ComposeEmailModal';
 import React from 'react';
-import { getEmails as getEmailsOriginal, getEmailDetail, syncEmails } from '@/services/api';
+import {
+    getEmails as getEmailsOriginal,
+    getEmailDetail,
+    syncEmails,
+    searchEmails,
+    classifyEmails
+} from '@/services/api';
 
 // Define the Email type
 type Email = {
@@ -25,19 +31,53 @@ const Page = () => {
     const [emails, setEmails] = useState<Email[]>([]);
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
     const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
+    const [searchContent, setSearchContent] = useState('');
+    const [isEmailDetailOpen, setIsEmailDetailOpen] = useState(false);
+    const [isClassify, setIsClassify] = useState(false);
+
+
+
+    const fetchEmails = async () => {
+        try {
+            await syncEmails(); // Trigger sync first
+            const response = await getEmailsOriginal({
+                pageindex: 1,
+                pagesize: 20,
+                labelname: 'SPAM',
+                directionname: 'INBOX',
+            });
+
+            const mappedEmails = response.map((item: any, index: number) => ({
+                id: item.emailId,
+                subject: item.subject || '(Không có tiêu đề)',
+                sender: item.fromAddress || 'Không rõ người gửi',
+                snippet: item.snippet || '(Không có nội dung)',
+                content: item.body || item.details?.body || item.snippet || '(No content available)',
+                date: item.sentDate || item.receivedDate || new Date().toISOString(),
+                isRead: true, // Cần cập nhật theo trường hợp thực tế nếu API cung cấp
+                labels: item.labelName ? [item.labelName] : ['Chưa gắn nhãn'],
+            }));
+
+            setEmails(mappedEmails);
+        } catch (error) {
+            console.error('Failed to fetch emails:', error);
+        }
+    };
 
     useEffect(() => {
-        const fetchEmails = async () => {
-            try {
-                await syncEmails(); // Trigger sync first
-                const response = await getEmailsOriginal({
-                    pageindex: 1,
-                    pagesize: 100,
-                    labelname: 'SPAM',
-                    directionname: 'INBOX',
-                });
+        fetchEmails();
+    }, []);
 
-                const mappedEmails = response.map((item: any, index: number) => ({
+    useEffect(() => {
+        const fetchSearchResults = async () => {
+            if (searchContent.trim() === '') {
+                return; // Không tìm kiếm nếu không có nội dung
+            }
+            try {
+                const response = await searchEmails(1, 20, searchContent);
+                console.log('Search Results:', response);
+
+                const mappedEmails = response.map((item: any) => ({
                     id: item.emailId,
                     subject: item.subject || '(Không có tiêu đề)',
                     sender: item.fromAddress || 'Không rõ người gửi',
@@ -47,21 +87,43 @@ const Page = () => {
                     isRead: true, // Cần cập nhật theo trường hợp thực tế nếu API cung cấp
                     labels: item.labelName ? [item.labelName] : ['Chưa gắn nhãn'],
                 }));
-
                 setEmails(mappedEmails);
             } catch (error) {
-                console.error('Failed to fetch emails:', error);
+                console.error('Lỗi tìm kiếm email:', error);
             }
         };
 
-        fetchEmails();
-    }, []);
+        fetchSearchResults();
+    }, [searchContent]);
+
+    useEffect(() => {
+        if (isClassify) {
+            const classify = async () => {
+                try {
+                    const result = await classifyEmails();
+                    console.log('Kết quả phân loại:', result);
+
+                    fetchEmails();
+                } catch (error) {
+                    console.error('Lỗi phân loại email:', error);
+                    alert('Không thể phân loại email. Vui lòng thử lại sau.');
+                }
+            };
+            classify();
+
+            setIsClassify(false);
+        }
+    }, [isClassify]);
 
     const toggleSelect = (id: string) => {
         setSelectedIds(prev =>
             prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
         );
     };
+
+    const handleOpenEmailModal = () => {
+        setIsEmailDetailOpen(true);
+    }
 
     const handleEmailClick = async (emailId: string) => {
         try {
@@ -85,11 +147,15 @@ const Page = () => {
             console.error('Lỗi lấy nội dung email:', error);
         }
     };
-
+    console.log('Selected Email:', selectedEmail);
     return (
         <div className="flex min-h-screen bg-gradient-to-br from-blue-100 to-purple-200 text-gray-800">
             <div className="sticky top-0 h-screen">
-                <Sidebar onCompose={() => console.log('Compose email')} />
+                <Sidebar
+                    onCompose={handleOpenEmailModal}
+                    setSearchContent={setSearchContent}
+                    setIsClassify={setIsClassify}
+                />
             </div>
             <div className="flex-1 p-6 space-y-4 overflow-y-auto">
                 {emails.map(email => (
@@ -131,6 +197,12 @@ const Page = () => {
                             )
                         );
                     }}
+                />
+            )}
+            {isEmailDetailOpen && (
+                <ComposeEmailModal
+                    onClose={() => setIsEmailDetailOpen(false)}
+                    onCompose={() => console.log('Compose email')}
                 />
             )}
         </div>
