@@ -27,13 +27,14 @@ export const getEmailDetail = async (emailId: string) => {
     `https://localhost:44366/email/messages/${emailId}`,
     { headers: { Authorization: `Bearer ${token}` } }
   );
+  console.log(res.data)
   return res.data;
 };
 
 // GET /classify/:id
-export const classifyEmails = async (id: string) => {
+export const classifyEmails = async () => {
   const token = localStorage.getItem('jwtToken');
-  const res = await axios.get(`https://localhost:44366/classify/${id}`, {
+  const res = await axios.get(`https://localhost:44366/email/classify`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;
@@ -41,12 +42,15 @@ export const classifyEmails = async (id: string) => {
 
 // POST /emails
 export const sendEmail = async (payload: {
-  to: string;
+  // toAdress: string;
+  // subject: string;
+  // body: string;
+  toAddress: string;
   subject: string;
-  content: string;
+  body: string;
 }) => {
   const token = localStorage.getItem('jwtToken');
-  const res = await axios.post('https://localhost:44366/emails', payload, {
+  const res = await axios.post('https://localhost:44366/email/messages/send', payload, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;
@@ -54,12 +58,14 @@ export const sendEmail = async (payload: {
 
 // POST /emails/draft
 export const createDraftEmail = async (payload: {
-  to: string;
+  toAddress: string;
   subject: string;
-  content: string;
+  body: string;
 }) => {
   const token = localStorage.getItem('jwtToken');
-  const res = await axios.post('https://localhost:44366/emails/draft', payload, {
+  console.log(token);
+
+  const res = await axios.post('https://localhost:44366/email/drafts/save', payload, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;
@@ -68,16 +74,18 @@ export const createDraftEmail = async (payload: {
 // DELETE /emails/:id
 export const deleteEmail = async (id: string) => {
   const token = localStorage.getItem('jwtToken');
-  const res = await axios.delete(`https://localhost:44366/emails/${id}`, {
+  const res = await axios.delete(`https://localhost:44366/email/messages/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;
-};
+}
 
 // GET /emails/search?keyword=abc
-export const searchEmails = async (keyword: string) => {
+export const searchEmails = async (pageindex: number, pagesize: number, keyword: string) => {
+  pageindex = pageindex || 1;
+  pagesize = pagesize || 20;
   const token = localStorage.getItem('jwtToken');
-  const res = await axios.get(`https://localhost:44366/emails/search?keyword=${encodeURIComponent(keyword)}`, {
+  const res = await axios.get(`https://localhost:44366/email/messages/search?pageindex=${pageindex}&pagesize=${pagesize}&keyword=${encodeURIComponent(keyword)}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;
@@ -91,7 +99,7 @@ export const syncEmails = async () => {
   return res.data;
 };
 
-// GET /email/messages
+// GET /email/messgeages
 export const getEmails = async (params: {
   pageindex?: number;
   pagesize?: number;
@@ -99,7 +107,7 @@ export const getEmails = async (params: {
   directionname?: string;
 }) => {
   const token = localStorage.getItem('jwtToken');
-  const { pageindex = 1, pagesize = 100, labelname = 'SPAM', directionname = 'INBOX' } = params;
+  const { pageindex = 1, pagesize = 20, labelname = 'SPAM', directionname = 'INBOX' } = params;
   const res = await axios.get(`https://localhost:44366/email/messages?pageindex=${pageindex}&pagesize=${pagesize}&labelname=${labelname}&directionname=${directionname}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -117,6 +125,8 @@ export const updateDraftEmail = async (id: string, payload: {
   });
   return res.data;
 }
+
+
 export const EMAIL_API = {
   // getEmail,
   getEmailDetail,
