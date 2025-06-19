@@ -20,20 +20,25 @@ type Props = {
   setIsClassify: (isClassify: boolean) => void;
 };
 
-export function Sidebar({ onCompose, setSearchContent, setIsClassify }: Props) {
+export function SidebarGuest({
+  onCompose,
+  setSearchContent,
+  setIsClassify,
+}: Props) {
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [profileImage, setProfileImage] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [showSidebar, setShowSidebar] = useState(false);
+  const truncate = (str: string, maxLength: number) => {
+    return str.length > maxLength ? str.slice(0, maxLength) + "..." : str;
+  };
 
   // Load thông tin user từ localStorage
   const loadUserInfo = () => {
     setUserName(localStorage.getItem("userName") || "Guest");
-    setUserEmail(localStorage.getItem("userId") || "No email");
-    setProfileImage(
-      localStorage.getItem("profileImage") || "https://i.pravatar.cc/40"
-    );
+    const guestId = localStorage.getItem("guestId") || "Unknown";
+    setUserEmail(truncate(guestId, 10));
   };
 
   useEffect(() => {
@@ -50,15 +55,6 @@ export function Sidebar({ onCompose, setSearchContent, setIsClassify }: Props) {
   const handleSearch = () => {
     setSearchContent(searchQuery);
   };
-
-  // Auto refresh token định kỳ
-  useEffect(() => {
-    const interval = setInterval(() => {
-      autoRefreshToken();
-    }, 2 * 60 * 1000); // 2 phút
-
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <>
@@ -88,11 +84,9 @@ export function Sidebar({ onCompose, setSearchContent, setIsClassify }: Props) {
 
         {/* Thông tin người dùng */}
         <div className="flex items-center gap-3">
-          <img
-            src={profileImage}
-            className="rounded-full w-9 h-9"
-            alt="avatar"
-          />
+          <div className="w-9 h-9 rounded-full bg-gray-300 flex items-center justify-center text-white font-bold text-sm">
+            G
+          </div>
           <div className="flex flex-col">
             <span className="font-semibold">{userName}</span>
             <span className="text-xs text-gray-500">{userEmail}</span>
@@ -127,12 +121,10 @@ export function Sidebar({ onCompose, setSearchContent, setIsClassify }: Props) {
         {/* Danh mục chính */}
         <div>
           <div className="uppercase text-xs text-gray-400 mb-1">Hộp thư</div>
-          <SidebarItem icon={faInbox} label="Hộp thư đến" href="/inbox" />
-          <SidebarItem icon={faPaperPlane} label="Đã gửi" href="/sent" />
-          <SidebarItem icon={faPen} label="Thư nháp" href="/drafts" />
+          <SidebarItem icon={faInbox} label="Toàn bộ thư" href="/guest/inbox" />
         </div>
 
-        {/* Công cụ
+        {/* Công cụ */}
         <div>
           <div className="uppercase text-xs text-gray-400 mb-1 mt-4">
             Công cụ
@@ -142,7 +134,7 @@ export function Sidebar({ onCompose, setSearchContent, setIsClassify }: Props) {
             label="Phân loại tự động"
             onClick={() => setIsClassify(true)}
           />
-        </div> */}
+        </div>
 
         {/* Đăng xuất */}
         <div className="mt-auto">

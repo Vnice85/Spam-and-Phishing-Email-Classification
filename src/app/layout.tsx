@@ -1,34 +1,28 @@
+import type React from "react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { config } from "@fortawesome/fontawesome-svg-core";
-import "@fortawesome/fontawesome-svg-core/styles.css";
-import { autoRefreshToken } from "@/utils/auth";
-import BackgroundProcess from "@/components/BackgroundProcess";
 
 const inter = Inter({
-  subsets: ["latin"],
+  subsets: ["latin", "vietnamese"],
+  display: "swap",
   variable: "--font-inter",
 });
 
-config.autoAddCss = false;
-
 export const metadata: Metadata = {
-  title: "Mail Classifier",
-  description: "Giao diện phân loại email",
+  title: "Email Classifier - Nền tảng phân loại Email thông minh",
+  description:
+    "Quản lý hộp thư hiệu quả với Machine Learning: chống spam, lọc phishing, phân loại nội dung.",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en">
-      <body className={`${inter.variable} antialiased`}>
-        <BackgroundProcess />
-        {children}
-      </body>
+    <html lang="vi" className={inter.variable}>
+      <body className={`${inter.className} antialiased`}>{children}</body>
     </html>
   );
 }
