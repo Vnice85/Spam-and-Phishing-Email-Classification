@@ -124,18 +124,6 @@ export function SidebarGuest({
           <SidebarItem icon={faInbox} label="Toàn bộ thư" href="/guest/inbox" />
         </div>
 
-        {/* Công cụ */}
-        <div>
-          <div className="uppercase text-xs text-gray-400 mb-1 mt-4">
-            Công cụ
-          </div>
-          <SidebarItem
-            icon={faRobot}
-            label="Phân loại tự động"
-            onClick={() => setIsClassify(true)}
-          />
-        </div>
-
         {/* Đăng xuất */}
         <div className="mt-auto">
           <button

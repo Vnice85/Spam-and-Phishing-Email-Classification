@@ -196,7 +196,7 @@ export default function ComposeEmailModal({
 
         <div className="p-6 space-y-6">
           {/* From */}
-          <div>
+          <div className={guestMode ? "" : "hidden"}>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Gửi từ <span className="text-red-500">*</span>
             </label>

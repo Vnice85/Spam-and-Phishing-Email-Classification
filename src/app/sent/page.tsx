@@ -5,6 +5,8 @@ import EmailDetailModal from "@/components/EmailDetailModal";
 import { Star } from "lucide-react";
 import ComposeEmailModal from "@/components/ComposeEmailModal";
 import React from "react";
+import * as signalR from "@microsoft/signalr";
+import { startConnection, stopConnection } from "@/services/signalr";
 import {
   getEmails as getEmailsOriginal,
   getEmailDetail,
@@ -94,9 +96,43 @@ const Page = () => {
   };
 
   useEffect(() => {
-    syncEmails().then(() => fetchEmails(1));
-  }, []);
+    let isMounted = true;
 
+    const init = async () => {
+      try {
+        await syncEmails();
+        await fetchEmails(1);
+
+        const conn = startConnection((emailId, newLabel) => {
+          if (!isMounted) return;
+          setEmails((prev) =>
+            prev.map((e) =>
+              e.id === emailId ? { ...e, labels: [newLabel] } : e
+            )
+          );
+        });
+
+        // Kiểm tra kết nối sau 3s
+        const checkConnection = setTimeout(() => {
+          if (conn?.state !== signalR.HubConnectionState.Connected) {
+            console.warn("Reconnecting SignalR...");
+            conn?.start().catch(console.error);
+          }
+        }, 3000);
+
+        return () => clearTimeout(checkConnection);
+      } catch (error) {
+        console.error("Initialization error:", error);
+      }
+    };
+
+    init();
+
+    return () => {
+      isMounted = false;
+      stopConnection().catch(console.error);
+    };
+  }, []);
   useEffect(() => {
     const fetchSearchResults = async () => {
       if (searchContent.trim() === "") return;
@@ -316,8 +352,9 @@ const Page = () => {
                   const map = {
                     NORMAL: ["bg-green-100", "text-green-700"],
                     UNDEFINE: ["bg-gray-100", "text-gray-700"],
-                    SPAM: ["bg-yellow-100", "text-yellow-700"],
-                    PHISHING: ["bg-red-100", "text-red-700"],
+                    // NORMAL: ["hidden"],
+                    // UNDEFINE: ["hidden"],
+                    "SPAM/PHISHING": ["bg-red-100", "text-red-700"],
                   };
                   const upperLabel = label.toUpperCase() as keyof typeof map;
                   const [bgColor, textColor] = map[upperLabel] || [

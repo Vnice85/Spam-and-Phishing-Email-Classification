@@ -97,9 +97,13 @@ export const deleteGuestEmail = async (emailId: string) => {
 // Auth
 export const refreshToken = async () => {
   const token = localStorage.getItem("jwtToken");
-  const res = await axios.get("https://localhost:44366/auth/refreshtoken", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await axios.post(
+    "https://localhost:44366/auth/refreshtoken",
+    null,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
   return res.data;
 };
 
@@ -116,7 +120,7 @@ export const getEmailDetail = async (emailId: string) => {
 
 export const classifyEmails = async () => {
   const token = localStorage.getItem("jwtToken");
-  const res = await axios.get(`https://localhost:44366/email/classify`, {
+  const res = await axios.post(`https://localhost:44366/email/classify`, null, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;
@@ -188,7 +192,7 @@ export const searchEmails = async (
 
 export const syncEmails = async () => {
   const token = localStorage.getItem("jwtToken");
-  const res = await axios.get("https://localhost:44366/email/sync", {
+  const res = await axios.post("https://localhost:44366/email/sync", null, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;

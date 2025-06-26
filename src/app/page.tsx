@@ -102,25 +102,7 @@ export default function HomePage() {
             </div>
           </div>
         </section>
-
-        {/* CTA Section */}
-        <section className="py-8 px-4 sm:px-8 text-center max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-br from-blue-600 via-purple-500 to-pink-500 drop-shadow-md">
-            Trải nghiệm ngay hệ thống phân loại email tự động
-          </h2>
-          <button
-            onClick={() => router.push("/register")}
-            className="px-8 py-3 text-lg rounded-full font-semibold text-white bg-gradient-to-br from-blue-500 to-purple-500 hover:brightness-110 hover:shadow-lg hover:shadow-purple-400/50 transition-all duration-300"
-          >
-            Bắt đầu sử dụng miễn phí
-          </button>
-        </section>
       </div>
-
-      {/* Footer */}
-      <footer className="text-center py-4 text-sm text-gray-900 font-medium">
-        © 2025 Email Classifier. All rights reserved.
-      </footer>
     </main>
   );
 }
